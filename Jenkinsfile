@@ -63,15 +63,17 @@ pipeline {
 
 		stage('Git Tag') {
 			steps {
-				sh """
-                    ssh -o StrictHostKeyChecking=no root@172.17.0.1 "
-                        cd /tmp
-                        git clone https://jakubbbdev:${GITHUB_TOKEN}@github.com/jakubbbdev/demo-api.git || true
-                        cd demo-api
-                        git tag v${VERSION}
-                        git push origin v${VERSION}
-                    "
-                """
+				withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'GH_TOKEN')]) {
+					sh """
+                ssh -o StrictHostKeyChecking=no root@172.17.0.1 "
+                    rm -rf /tmp/demo-api
+                    git clone https://jakubbbdev:${GH_TOKEN}@github.com/jakubbbdev/demo-api.git /tmp/demo-api
+                    cd /tmp/demo-api
+                    git tag v${VERSION}
+                    git push origin v${VERSION}
+                "
+            """
+				}
 			}
 		}
 
