@@ -65,17 +65,16 @@ pipeline {
 			steps {
 				withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'GH_TOKEN')]) {
 					sh '''
-                ssh -o StrictHostKeyChecking=no root@172.17.0.1 "
-                    rm -rf /tmp/demo-api
-                    git clone https://jakubbbdev:$GH_TOKEN@github.com/jakubbbdev/demo-api.git /tmp/demo-api
-                    cd /tmp/demo-api
-                    git tag v$VERSION
-                    git push origin v$VERSION
-                "
+                git config user.email "jenkins@ci"
+                git config user.name "Jenkins"
+
+                git tag v$VERSION
+                git push https://jakubbbdev:$GH_TOKEN@github.com/jakubbbdev/demo-api.git v$VERSION
             '''
 				}
 			}
 		}
+
 		stage('Deploy') {
 			steps {
 				sh """
