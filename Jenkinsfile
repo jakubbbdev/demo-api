@@ -45,12 +45,21 @@ pipeline {
 			}
 		}
 
+		stage('Nexus Login') {
+			steps {
+				withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+					sh "docker login 5.175.192.225:8085 -u ${NEXUS_USER} -p ${NEXUS_PASS}"
+				}
+			}
+		}
+
 		stage('Push to Nexus') {
 			steps {
 				sh "docker push ${NEXUS_URL}/${IMAGE_NAME}:${VERSION}"
 				sh "docker push ${NEXUS_URL}/${IMAGE_NAME}:latest"
 			}
 		}
+
 
 		stage('Git Tag') {
 			steps {
